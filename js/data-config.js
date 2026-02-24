@@ -26,21 +26,19 @@ const DATA_CONFIG = {
      */
     dataBranch: 'data',
 
-    /**
-     * Get the base URL for raw GitHub content from data branch
-     * @returns {string} Base URL for raw GitHub content
-     */
     getDataBaseUrl: function() {
+        const isLocal = ['localhost', '127.0.0.1'].includes(window.location.hostname);
+        if (isLocal) return '';
         return `https://raw.githubusercontent.com/${this.repoOwner}/${this.repoName}/${this.dataBranch}`;
     },
 
-    /**
-     * Get the full URL for a data file
-     * @param {string} filePath - Relative path to the data file (e.g., 'data/2025-01-01.jsonl')
-     * @returns {string} Full URL to the data file
-     */
     getDataUrl: function(filePath) {
-        return `${this.getDataBaseUrl()}/${filePath}`;
+        const base = this.getDataBaseUrl();
+        if (!base) return `/${filePath}`;
+        return `${base}/${filePath}`;
+    },
+
+    getRepoApiUrl: function() {
+        return `https://api.github.com/repos/${this.repoOwner}/${this.repoName}`;
     }
 };
-
