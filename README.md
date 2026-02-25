@@ -40,6 +40,18 @@ This repo will daily crawl arXiv papers about **cs.CV, cs.GR, cs.CL and cs.AI**,
 If you wish to crawl other arXiv categories, use other LLMs, or other languages, please follow the instructions.
 Otherwise, you can directly use this repo in https://dw-dengwei.github.io/daily-arXiv-ai-enhanced/. Please star it if you like :)
 
+## Local env (avoid `OPENAI_BASE_URL` conflicts with Codex/other tools)
+
+If you run the project locally, do not put project-specific `OPENAI_API_KEY` / `OPENAI_BASE_URL` in your global `~/.zshrc`.
+
+Use a project-local env file instead:
+
+1. Copy `.env.local.example` to `.env.local`
+2. Fill in your own API key and base URL
+3. Run `bash run-local-env.sh`
+
+This keeps the variables scoped to this project run and avoids polluting other shells or tools.
+
 **Instructions:**
 1. Fork this repo to your own account and delete my own information in [by-me-a-coffee](./buy-me-a-coffee/README.md).
 2. Go to: your-own-repo -> Settings -> Secrets and variables -> Actions
