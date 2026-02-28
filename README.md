@@ -52,6 +52,22 @@ Use a project-local env file instead:
 
 This keeps the variables scoped to this project run and avoids polluting other shells or tools.
 
+### Favorites Sync (optional, local browser feature)
+
+You can favorite papers on `index.html` and sync favorites to the repository `data` branch.
+
+- Favorites are stored per user in `favorites/<github_login>.json` on the `data` branch.
+- Sync uses GitHub PAT entered in `settings.html` (stored in browser `localStorage` only).
+- If PAT is not configured, favorites still work locally but are marked as not synced.
+
+Recommended PAT permission:
+
+- Fine-grained token with repository contents write permission (`contents:write`) for your fork.
+
+Security note:
+
+- PAT in `localStorage` is local-browser only but still sensitive. Use least privilege and rotate regularly.
+
 **Instructions:**
 1. Fork this repo to your own account and delete my own information in [by-me-a-coffee](./buy-me-a-coffee/README.md).
 2. Go to: your-own-repo -> Settings -> Secrets and variables -> Actions

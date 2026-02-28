@@ -127,6 +127,35 @@
                             </div>
                         </div>
                     </div>
+
+                    <div class="settings-section">
+                        <h2 class="keyword-section-title">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" fill="currentColor"/>
+                            </svg>
+                            Favorites Sync
+                        </h2>
+                        <div class="settings-card">
+                            <div class="settings-item favorites-token-row">
+                                <label for="favoritePatInput">GitHub PAT</label>
+                                <div class="favorite-sync-input-group">
+                                    <input type="password" id="favoritePatInput" class="settings-input" placeholder="github_pat_xxx (contents:write)">
+                                    <button id="verifyFavoritePat" class="add-tag-button">Verify & Save</button>
+                                </div>
+                            </div>
+                            <div class="favorites-help-text">
+                                PAT is stored only in your browser localStorage. Use fine-grained token with repository contents write permission.
+                            </div>
+                            <div class="favorite-sync-status">
+                                <p><strong>GitHub User:</strong> <span id="favoriteGithubUser">Not configured</span></p>
+                                <p><strong>Last Sync:</strong> <span id="favoriteLastSync">-</span></p>
+                                <p><strong>Pending/Error:</strong> <span id="favoriteSyncError">-</span></p>
+                            </div>
+                            <div class="favorite-sync-actions">
+                                <button id="clearFavoritePat" class="button">Clear PAT</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="settings-actions">
@@ -143,6 +172,8 @@
         </footer>
     </div>
 
+    <script src="js/data-config.js"></script>
+    <script src="js/favorites-sync.js"></script>
     <script src="js/settings.js"></script>
 </body>
 </html> 

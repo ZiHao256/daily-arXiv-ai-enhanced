@@ -14,6 +14,225 @@ let currentFilteredPapers = []; // 当前过滤后的论文列表
 let textSearchQuery = ''; // 实时文本搜索查询
 let previousActiveKeywords = null; // 文本搜索激活时，暂存之前的关键词激活集合
 let previousActiveAuthors = null; // 文本搜索激活时，暂存之前的作者激活集合
+let favoritePaperIds = new Set(); // 收藏论文ID
+let favoritesOnlyMode = false; // 仅收藏筛选模式
+let favoriteSyncState = { enabled: false, pending: false, lastError: '', lastSyncAt: '' };
+let currentModalPaper = null; // 当前弹窗中的论文对象
+
+function parseJsonSafe(text, fallback) {
+  if (!text) return fallback;
+  try {
+    return JSON.parse(text);
+  } catch (_error) {
+    return fallback;
+  }
+}
+
+function getPaperKey(paper) {
+  if (!paper) return '';
+  const id = String(paper.id || '').trim();
+  if (id) return id;
+  return String(paper.url || '').trim();
+}
+
+function persistFavoriteIds() {
+  const ids = Array.from(favoritePaperIds);
+  if (window.FavoritesSync) {
+    FavoritesSync.setFavoritePaperIds(ids);
+  } else {
+    localStorage.setItem('favoritePaperIds', JSON.stringify(ids));
+  }
+}
+
+function refreshFavoriteSyncStateFromStorage() {
+  if (window.FavoritesSync) {
+    favoriteSyncState = FavoritesSync.getFavoriteSyncState();
+  } else {
+    favoriteSyncState = {
+      enabled: false,
+      pending: false,
+      lastError: '',
+      lastSyncAt: '',
+    };
+  }
+}
+
+function getFavoriteButtonTitle(isFavorite) {
+  if (!isFavorite) return 'Add to Favorites';
+  if (!favoriteSyncState.enabled) return 'Saved locally (not synced)';
+  if (favoriteSyncState.pending) return 'Saved locally, sync pending';
+  return 'Remove from Favorites';
+}
+
+function updateFavoriteButtonVisual(button, isFavorite) {
+  if (!button) return;
+  const showUnsynced = isFavorite && (!favoriteSyncState.enabled || favoriteSyncState.pending);
+  button.classList.toggle('active', isFavorite);
+  button.classList.toggle('unsynced', showUnsynced);
+  button.textContent = isFavorite ? '★' : '☆';
+  button.title = getFavoriteButtonTitle(isFavorite);
+  button.setAttribute('aria-label', button.title);
+}
+
+function updateFavoritesFilterUI() {
+  const toggleButton = document.getElementById('favoritesToggle');
+  const countElement = document.getElementById('favoritesCount');
+  if (countElement) {
+    countElement.textContent = String(favoritePaperIds.size);
+  }
+  if (toggleButton) {
+    toggleButton.classList.toggle('active', favoritesOnlyMode);
+    toggleButton.classList.toggle(
+      'has-unsynced',
+      favoritePaperIds.size > 0 && (!favoriteSyncState.enabled || favoriteSyncState.pending)
+    );
+    toggleButton.title = favoritesOnlyMode ? 'Showing favorite papers only' : 'Show favorite papers only';
+  }
+}
+
+function showAppNotification(message, type = 'info') {
+  let notification = document.querySelector('.app-notification');
+  if (!notification) {
+    notification = document.createElement('div');
+    notification.className = 'app-notification';
+    document.body.appendChild(notification);
+  }
+
+  const bgColor = type === 'error' ? '#dc2626' : '#2563eb';
+  notification.textContent = message;
+  notification.style.position = 'fixed';
+  notification.style.bottom = '20px';
+  notification.style.right = '20px';
+  notification.style.backgroundColor = bgColor;
+  notification.style.color = '#fff';
+  notification.style.padding = '10px 14px';
+  notification.style.borderRadius = '8px';
+  notification.style.zIndex = '2000';
+  notification.style.opacity = '0';
+  notification.style.transform = 'translateY(12px)';
+  notification.style.transition = 'opacity 0.25s ease, transform 0.25s ease';
+
+  setTimeout(() => {
+    notification.style.opacity = '1';
+    notification.style.transform = 'translateY(0)';
+  }, 10);
+
+  setTimeout(() => {
+    notification.style.opacity = '0';
+    notification.style.transform = 'translateY(12px)';
+  }, 2500);
+}
+
+function buildFavoritePaperIndexMap() {
+  const index = {};
+  Object.keys(paperData || {}).forEach((category) => {
+    (paperData[category] || []).forEach((paper) => {
+      const key = getPaperKey(paper);
+      if (!key || index[key]) return;
+      index[key] = {
+        title: paper.title || '',
+        abs_url: paper.url || '',
+        date: paper.date || '',
+      };
+    });
+  });
+  return index;
+}
+
+async function syncFavoritesToRepoIfNeeded() {
+  refreshFavoriteSyncStateFromStorage();
+  if (!window.FavoritesSync || !favoriteSyncState.enabled) {
+    updateFavoritesFilterUI();
+    return { ok: false, reason: 'not_configured' };
+  }
+
+  const result = await FavoritesSync.syncFavoritesToRepo({
+    favoriteIds: Array.from(favoritePaperIds),
+    paperIndexMap: buildFavoritePaperIndexMap(),
+  });
+  refreshFavoriteSyncStateFromStorage();
+  updateFavoritesFilterUI();
+  return result;
+}
+
+function updateModalFavoriteButton() {
+  const favoriteButton = document.getElementById('favoriteToggleButton');
+  if (!favoriteButton) return;
+  if (!currentModalPaper) {
+    favoriteButton.style.display = 'none';
+    return;
+  }
+  favoriteButton.style.display = 'inline-flex';
+  const paperId = getPaperKey(currentModalPaper);
+  if (!paperId) {
+    favoriteButton.disabled = true;
+    favoriteButton.title = 'Favorite unavailable';
+    favoriteButton.textContent = '☆';
+    return;
+  }
+  favoriteButton.disabled = false;
+  updateFavoriteButtonVisual(favoriteButton, favoritePaperIds.has(paperId));
+}
+
+async function initFavoritesState() {
+  if (window.FavoritesSync) {
+    favoritePaperIds = new Set(FavoritesSync.getFavoritePaperIds());
+    refreshFavoriteSyncStateFromStorage();
+    updateFavoritesFilterUI();
+
+    if (favoriteSyncState.enabled) {
+      try {
+        const remote = await FavoritesSync.fetchRemoteFavoritesForCurrentUser();
+        const merged = FavoritesSync.mergeFavoriteIds(Array.from(favoritePaperIds), remote.items);
+        favoritePaperIds = new Set(merged);
+        FavoritesSync.setFavoritePaperIds(merged);
+        FavoritesSync.clearFavoriteSyncPending();
+      } catch (error) {
+        console.error('加载远端收藏失败:', error);
+        FavoritesSync.setFavoriteSyncPending({
+          pending: true,
+          lastError: error.message || String(error),
+          updatedAt: new Date().toISOString(),
+        });
+      }
+    }
+  } else {
+    favoritePaperIds = new Set(parseJsonSafe(localStorage.getItem('favoritePaperIds'), []));
+    favoriteSyncState = { enabled: false, pending: false, lastError: '', lastSyncAt: '' };
+  }
+
+  refreshFavoriteSyncStateFromStorage();
+  updateFavoritesFilterUI();
+}
+
+async function toggleFavoritePaper(paper) {
+  const paperId = getPaperKey(paper);
+  if (!paperId) return;
+
+  if (favoritePaperIds.has(paperId)) {
+    favoritePaperIds.delete(paperId);
+  } else {
+    favoritePaperIds.add(paperId);
+  }
+
+  persistFavoriteIds();
+  updateFavoritesFilterUI();
+  renderPapers();
+  updateModalFavoriteButton();
+
+  const syncResult = await syncFavoritesToRepoIfNeeded();
+  if (!syncResult.ok && syncResult.reason !== 'not_configured') {
+    showAppNotification('Favorites saved locally, but repo sync failed.', 'error');
+  }
+  renderPapers();
+  updateModalFavoriteButton();
+}
+
+function toggleFavoritesOnlyMode() {
+  favoritesOnlyMode = !favoritesOnlyMode;
+  updateFavoritesFilterUI();
+  renderPapers();
+}
 
 // 加载用户的关键词设置
 function loadUserKeywords() {
@@ -207,7 +426,7 @@ function toggleAuthorFilter(author) {
   renderPapers();
 }
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
   initEventListeners();
   
   fetchGitHubStats();
@@ -217,12 +436,13 @@ document.addEventListener('DOMContentLoaded', () => {
   
   // 加载用户作者
   loadUserAuthors();
-  
-  fetchAvailableDates().then(() => {
-    if (availableDates.length > 0) {
-      loadPapersByDate(availableDates[0]);
-    }
-  });
+
+  await initFavoritesState();
+
+  await fetchAvailableDates();
+  if (availableDates.length > 0) {
+    loadPapersByDate(availableDates[0]);
+  }
 });
 
 async function fetchGitHubStats() {
@@ -265,6 +485,25 @@ function initEventListeners() {
   
   // 其他原有的事件监听器
   document.getElementById('closeModal').addEventListener('click', closeModal);
+
+  const favoriteModalButton = document.getElementById('favoriteToggleButton');
+  if (favoriteModalButton) {
+    favoriteModalButton.addEventListener('click', async (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      if (!currentModalPaper) return;
+      await toggleFavoritePaper(currentModalPaper);
+    });
+  }
+
+  const favoritesToggle = document.getElementById('favoritesToggle');
+  if (favoritesToggle) {
+    favoritesToggle.addEventListener('click', (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      toggleFavoritesOnlyMode();
+    });
+  }
   
   document.querySelector('.paper-modal').addEventListener('click', (event) => {
     const modal = document.querySelector('.paper-modal');
@@ -379,6 +618,7 @@ function initEventListeners() {
   categoryButtons.forEach(button => {
     button.addEventListener('click', () => {
       const category = button.dataset.category;
+      if (!category) return;
       filterByCategory(category);
     });
   });
@@ -1133,13 +1373,21 @@ function renderPapers() {
     });
   }
   
+  if (favoritesOnlyMode) {
+    filteredPapers = filteredPapers.filter((paper) => {
+      const key = getPaperKey(paper);
+      return key && favoritePaperIds.has(key);
+    });
+  }
+
   // 存储当前过滤后的论文列表，用于箭头键导航
   currentFilteredPapers = [...filteredPapers];
+  updateFavoritesFilterUI();
   
   if (filteredPapers.length === 0) {
     container.innerHTML = `
       <div class="loading-container">
-        <p>No paper found.</p>
+        <p>${favoritesOnlyMode ? 'No favorite papers under current filters.' : 'No paper found.'}</p>
       </div>
     `;
     return;
@@ -1222,6 +1470,20 @@ function renderPapers() {
         </div>
       </div>
     `;
+
+    const paperId = getPaperKey(paper);
+    if (paperId) {
+      const favoriteButton = document.createElement('button');
+      favoriteButton.type = 'button';
+      favoriteButton.className = 'favorite-button';
+      updateFavoriteButtonVisual(favoriteButton, favoritePaperIds.has(paperId));
+      favoriteButton.addEventListener('click', async (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        await toggleFavoritePaper(paper);
+      });
+      paperCard.appendChild(favoriteButton);
+    }
     
     paperCard.addEventListener('click', () => {
       currentPaperIndex = index; // 记录当前点击的论文索引
@@ -1239,6 +1501,7 @@ function showPaperDetails(paper, paperIndex) {
   const paperLink = document.getElementById('paperLink');
   const pdfLink = document.getElementById('pdfLink');
   const htmlLink = document.getElementById('htmlLink');
+  currentModalPaper = paper;
   
   // 重置模态框的滚动位置
   modalBody.scrollTop = 0;
@@ -1345,6 +1608,7 @@ function showPaperDetails(paper, paperIndex) {
   document.getElementById('paperLink').href = paper.url;
   document.getElementById('pdfLink').href = paper.url.replace('abs', 'pdf');
   document.getElementById('htmlLink').href = paper.url.replace('abs', 'html');
+  updateModalFavoriteButton();
   
   // --- GitHub Button Logic ---
   const githubLink = document.getElementById('githubLink');
@@ -1381,6 +1645,8 @@ function closeModal() {
   
   modal.classList.remove('active');
   document.body.style.overflow = '';
+  currentModalPaper = null;
+  updateModalFavoriteButton();
 }
 
 // 导航到上一篇论文

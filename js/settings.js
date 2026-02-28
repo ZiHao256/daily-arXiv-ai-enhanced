@@ -10,6 +10,8 @@ function initSettings() {
   loadKeywordPreferences();
   // 作者偏好设置
   loadAuthorPreferences();
+  // 收藏同步配置
+  loadFavoriteSyncSettings();
 }
 
 // 从localStorage加载关键词偏好
@@ -66,6 +68,31 @@ function loadAuthorPreferences() {
     // 显示空标签消息
     showEmptyAuthorMessage();
   }
+}
+
+function loadFavoriteSyncSettings() {
+  const patInput = document.getElementById("favoritePatInput");
+  const loginSpan = document.getElementById("favoriteGithubUser");
+  const lastSyncSpan = document.getElementById("favoriteLastSync");
+  const errorSpan = document.getElementById("favoriteSyncError");
+
+  if (!patInput || !loginSpan || !lastSyncSpan || !errorSpan || !window.FavoritesSync) {
+    return;
+  }
+
+  const savedPat = FavoritesSync.getFavoriteGithubPat();
+  const savedLogin = FavoritesSync.getFavoriteGithubLogin();
+  const syncState = FavoritesSync.getFavoriteSyncState();
+
+  if (savedPat) {
+    patInput.value = savedPat;
+  }
+
+  loginSpan.textContent = savedLogin || "Not configured";
+  lastSyncSpan.textContent = syncState.lastSyncAt || "-";
+  errorSpan.textContent = syncState.pending
+    ? (syncState.lastError || "Pending sync")
+    : "-";
 }
 
 // 显示空标签消息
@@ -271,6 +298,16 @@ function initEventListeners() {
   // 重置设置按钮
   const resetSettingsButton = document.getElementById('resetSettings');
   resetSettingsButton.addEventListener('click', resetSettings);
+
+  const verifyFavoritePat = document.getElementById("verifyFavoritePat");
+  if (verifyFavoritePat) {
+    verifyFavoritePat.addEventListener("click", handleVerifyFavoritePat);
+  }
+
+  const clearFavoritePat = document.getElementById("clearFavoritePat");
+  if (clearFavoritePat) {
+    clearFavoritePat.addEventListener("click", handleClearFavoritePat);
+  }
 }
 
 // 保存设置
@@ -315,6 +352,71 @@ function resetSettings() {
   
   // 显示重置成功提示
   showNotification('Settings reset to default!', 'info');
+}
+
+async function handleVerifyFavoritePat() {
+  if (!window.FavoritesSync) {
+    showNotification("Favorites sync module not loaded.", "info");
+    return;
+  }
+
+  const patInput = document.getElementById("favoritePatInput");
+  if (!patInput) return;
+
+  const pat = patInput.value.trim();
+  if (!pat) {
+    showNotification("Please input GitHub PAT first.", "info");
+    return;
+  }
+
+  const button = document.getElementById("verifyFavoritePat");
+  if (button) {
+    button.disabled = true;
+    button.textContent = "Verifying...";
+  }
+
+  try {
+    const user = await FavoritesSync.validatePat(pat);
+    FavoritesSync.setFavoriteGithubPat(pat);
+    FavoritesSync.setFavoriteGithubLogin(user.login);
+    try {
+      const remote = await FavoritesSync.fetchRemoteFavoritesForCurrentUser();
+      const merged = FavoritesSync.mergeFavoriteIds(FavoritesSync.getFavoritePaperIds(), remote.items);
+      FavoritesSync.setFavoritePaperIds(merged);
+      FavoritesSync.clearFavoriteSyncPending();
+    } catch (remoteError) {
+      FavoritesSync.setFavoriteSyncPending({
+        pending: true,
+        lastError: remoteError.message || String(remoteError),
+        updatedAt: new Date().toISOString(),
+      });
+    }
+    loadFavoriteSyncSettings();
+    showNotification(`Favorites sync enabled for ${user.login}.`, "success");
+  } catch (error) {
+    showNotification(error.message || "PAT verification failed.", "info");
+  } finally {
+    if (button) {
+      button.disabled = false;
+      button.textContent = "Verify & Save";
+    }
+  }
+}
+
+function handleClearFavoritePat() {
+  if (!window.FavoritesSync) {
+    return;
+  }
+  FavoritesSync.clearFavoriteGithubPat();
+  FavoritesSync.clearFavoriteGithubLogin();
+  FavoritesSync.clearFavoriteSyncPending();
+  localStorage.removeItem(FavoritesSync.STORAGE_KEYS.favoriteLastSyncAt);
+  const patInput = document.getElementById("favoritePatInput");
+  if (patInput) {
+    patInput.value = "";
+  }
+  loadFavoriteSyncSettings();
+  showNotification("Favorites PAT cleared.", "info");
 }
 
 // 显示通知
