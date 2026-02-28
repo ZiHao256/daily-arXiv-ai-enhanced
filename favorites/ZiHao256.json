@@ -1,0 +1,35 @@
+{
+  "version": 1,
+  "owner": "ZiHao256",
+  "updated_at": "2026-02-28T07:53:22.083Z",
+  "items": [
+    {
+      "paper_id": "2602.22401",
+      "added_at": "2026-02-28T07:53:22.083Z",
+      "title": "Vibe Researching as Wolf Coming: Can AI Agents with Skills Replace or Augment Social Scientists?",
+      "abs_url": "https://arxiv.org/abs/2602.22401",
+      "date": "2026-02-28"
+    },
+    {
+      "paper_id": "2602.22983",
+      "added_at": "2026-02-28T07:53:22.083Z",
+      "title": "Obscure but Effective: Classical Chinese Jailbreak Prompt Optimization via Bio-Inspired Search",
+      "abs_url": "https://arxiv.org/abs/2602.22983",
+      "date": "2026-02-28"
+    },
+    {
+      "paper_id": "2602.22805",
+      "added_at": "2026-02-28T07:53:22.083Z",
+      "title": "Optimizing SSD-Resident Graph Indexing for High-Throughput Vector Search",
+      "abs_url": "https://arxiv.org/abs/2602.22805",
+      "date": "2026-02-28"
+    },
+    {
+      "paper_id": "2602.23342",
+      "added_at": "2026-02-28T07:53:22.083Z",
+      "title": "AlayaLaser: Efficient Index Layout and Search Strategy for Large-scale High-dimensional Vector Similarity Search",
+      "abs_url": "https://arxiv.org/abs/2602.23342",
+      "date": "2026-02-28"
+    }
+  ]
+}
