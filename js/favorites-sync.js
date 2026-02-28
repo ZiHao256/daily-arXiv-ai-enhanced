@@ -132,7 +132,7 @@
     return {
       repoOwner: dataConfig.repoOwner,
       repoName: dataConfig.repoName,
-      dataBranch: dataConfig.dataBranch || "data",
+      dataBranch: "main",
     };
   }
 

@@ -54,9 +54,9 @@ This keeps the variables scoped to this project run and avoids polluting other s
 
 ### Favorites Sync (optional, local browser feature)
 
-You can favorite papers on `index.html` and sync favorites to the repository `data` branch.
+You can favorite papers on `index.html` and sync favorites to the repository `main` branch.
 
-- Favorites are stored per user in `favorites/<github_login>.json` on the `data` branch.
+- Favorites are stored per user in `favorites/<github_login>.json` on the `main` branch.
 - Sync uses GitHub PAT entered in `settings.html` (stored in browser `localStorage` only).
 - If PAT is not configured, favorites still work locally but are marked as not synced.
 
