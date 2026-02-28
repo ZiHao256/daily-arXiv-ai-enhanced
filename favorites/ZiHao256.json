@@ -1,7 +1,7 @@
 {
   "version": 1,
   "owner": "ZiHao256",
-  "updated_at": "2026-02-28T07:53:22.083Z",
+  "updated_at": "2026-02-28T07:53:23.498Z",
   "items": [
     {
       "paper_id": "2602.22401",
@@ -29,6 +29,13 @@
       "added_at": "2026-02-28T07:53:22.083Z",
       "title": "AlayaLaser: Efficient Index Layout and Search Strategy for Large-scale High-dimensional Vector Similarity Search",
       "abs_url": "https://arxiv.org/abs/2602.23342",
+      "date": "2026-02-28"
+    },
+    {
+      "paper_id": "2602.22215",
+      "added_at": "2026-02-28T07:53:23.498Z",
+      "title": "Graph Your Way to Inspiration: Integrating Co-Author Graphs with Retrieval-Augmented Generation for Large Language Model Based Scientific Idea Generation",
+      "abs_url": "https://arxiv.org/abs/2602.22215",
       "date": "2026-02-28"
     }
   ]
