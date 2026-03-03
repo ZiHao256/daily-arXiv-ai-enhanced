@@ -1,7 +1,7 @@
 {
   "version": 1,
   "owner": "ZiHao256",
-  "updated_at": "2026-02-28T07:53:23.498Z",
+  "updated_at": "2026-03-03T07:43:34.923Z",
   "items": [
     {
       "paper_id": "2602.22401",
@@ -37,6 +37,13 @@
       "title": "Graph Your Way to Inspiration: Integrating Co-Author Graphs with Retrieval-Augmented Generation for Large Language Model Based Scientific Idea Generation",
       "abs_url": "https://arxiv.org/abs/2602.22215",
       "date": "2026-02-28"
+    },
+    {
+      "paper_id": "2602.23469",
+      "added_at": "2026-03-03T07:43:34.923Z",
+      "title": "CACTUSDB: Unlock Co-Optimization Opportunities for SQL and AI/ML Inferences",
+      "abs_url": "https://arxiv.org/abs/2602.23469",
+      "date": "2026-03-03"
     }
   ]
 }
