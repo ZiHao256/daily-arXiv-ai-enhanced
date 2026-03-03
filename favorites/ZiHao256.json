@@ -1,7 +1,7 @@
 {
   "version": 1,
   "owner": "ZiHao256",
-  "updated_at": "2026-03-03T07:43:34.923Z",
+  "updated_at": "2026-03-03T07:44:34.487Z",
   "items": [
     {
       "paper_id": "2602.22401",
@@ -43,6 +43,13 @@
       "added_at": "2026-03-03T07:43:34.923Z",
       "title": "CACTUSDB: Unlock Co-Optimization Opportunities for SQL and AI/ML Inferences",
       "abs_url": "https://arxiv.org/abs/2602.23469",
+      "date": "2026-03-03"
+    },
+    {
+      "paper_id": "2602.23999",
+      "added_at": "2026-03-03T07:44:34.487Z",
+      "title": "GPU-Native Approximate Nearest Neighbor Search with IVF-RaBitQ: Fast Index Build and Search",
+      "abs_url": "https://arxiv.org/abs/2602.23999",
       "date": "2026-03-03"
     }
   ]
