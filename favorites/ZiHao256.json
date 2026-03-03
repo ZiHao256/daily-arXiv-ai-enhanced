@@ -1,7 +1,7 @@
 {
   "version": 1,
   "owner": "ZiHao256",
-  "updated_at": "2026-03-03T07:44:34.487Z",
+  "updated_at": "2026-03-03T07:46:19.681Z",
   "items": [
     {
       "paper_id": "2602.22401",
@@ -51,6 +51,13 @@
       "title": "GPU-Native Approximate Nearest Neighbor Search with IVF-RaBitQ: Fast Index Build and Search",
       "abs_url": "https://arxiv.org/abs/2602.23999",
       "date": "2026-03-03"
+    },
+    {
+      "paper_id": "2602.21247",
+      "added_at": "2026-03-03T07:46:19.681Z",
+      "title": "PiPNN: Ultra-Scalable Graph-Based Nearest Neighbor Indexing",
+      "abs_url": "https://arxiv.org/abs/2602.21247",
+      "date": "2026-02-26"
     }
   ]
 }
