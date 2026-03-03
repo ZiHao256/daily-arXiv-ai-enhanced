@@ -1,7 +1,7 @@
 {
   "version": 1,
   "owner": "ZiHao256",
-  "updated_at": "2026-03-03T07:46:19.681Z",
+  "updated_at": "2026-03-03T07:48:23.299Z",
   "items": [
     {
       "paper_id": "2602.22401",
@@ -57,6 +57,20 @@
       "added_at": "2026-03-03T07:46:19.681Z",
       "title": "PiPNN: Ultra-Scalable Graph-Based Nearest Neighbor Indexing",
       "abs_url": "https://arxiv.org/abs/2602.21247",
+      "date": "2026-02-26"
+    },
+    {
+      "paper_id": "2602.21480",
+      "added_at": "2026-03-03T07:48:23.299Z",
+      "title": "Both Ends Count! Just How Good are LLM Agents at \"Text-to-Big SQL\"?",
+      "abs_url": "https://arxiv.org/abs/2602.21480",
+      "date": "2026-02-26"
+    },
+    {
+      "paper_id": "2602.21514",
+      "added_at": "2026-03-03T07:48:23.299Z",
+      "title": "I/O Optimizations for Graph-Based Disk-Resident Approximate Nearest Neighbor Search: A Design Space Exploration",
+      "abs_url": "https://arxiv.org/abs/2602.21514",
       "date": "2026-02-26"
     }
   ]
