@@ -1,7 +1,7 @@
 {
   "version": 1,
   "owner": "ZiHao256",
-  "updated_at": "2026-03-04T03:44:06.057Z",
+  "updated_at": "2026-03-04T03:45:44.410Z",
   "items": [
     {
       "paper_id": "2602.22401",
@@ -92,6 +92,13 @@
       "added_at": "2026-03-04T03:44:06.057Z",
       "title": "RAPO: Expanding Exploration for LLM Agents via Retrieval-Augmented Policy Optimization",
       "abs_url": "https://arxiv.org/abs/2603.03078",
+      "date": "2026-03-04"
+    },
+    {
+      "paper_id": "2603.02537",
+      "added_at": "2026-03-04T03:45:44.410Z",
+      "title": "Large Language Model-Enhanced Relational Operators: Taxonomy, Benchmark, and Analysis",
+      "abs_url": "https://arxiv.org/abs/2603.02537",
       "date": "2026-03-04"
     }
   ]
