@@ -1,7 +1,7 @@
 {
   "version": 1,
   "owner": "ZiHao256",
-  "updated_at": "2026-03-04T03:42:32.376Z",
+  "updated_at": "2026-03-04T03:44:06.057Z",
   "items": [
     {
       "paper_id": "2602.22401",
@@ -85,6 +85,13 @@
       "added_at": "2026-03-04T03:42:32.376Z",
       "title": "Diagnosing Retrieval vs. Utilization Bottlenecks in LLM Agent Memory",
       "abs_url": "https://arxiv.org/abs/2603.02473",
+      "date": "2026-03-04"
+    },
+    {
+      "paper_id": "2603.03078",
+      "added_at": "2026-03-04T03:44:06.057Z",
+      "title": "RAPO: Expanding Exploration for LLM Agents via Retrieval-Augmented Policy Optimization",
+      "abs_url": "https://arxiv.org/abs/2603.03078",
       "date": "2026-03-04"
     }
   ]
